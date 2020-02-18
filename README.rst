@@ -43,8 +43,80 @@ Excercise description
 
 -----
 
-Docker Solution
----------------
+
+Some Additional Considerations
+------------------------------
+
+- SSL
+- Codebased Infrastructure
+- Immutable Infrastructure
+- CI/CD
+- Integaration of Application Code with Infrastructure APIs
+
+
+
+
+I came up with 5 alternative solutions. All solutions assume AWS as cloud provider:
+
+1. Managed EC2 with Puppet
+2. Immutable EC2 with autoscaling
+3. Docker in ECS with EFS
+4. Docker in Fargate with S3
+5. Lambda with S3, ApiGateway, and CloudFront
+
+
+1. Managed EC2 with Puppet
+--------------------------
+
+In this scenario, the application is hosted on two EC2 instances each
+deployed into a separate Availabitly Zone for high availability.  DB
+backend is hosted on two RDS instances (again, in separate AZs) one of
+which is a read-only replica.  A single EFS instance is mounted by
+both EC2 instances to provide shared storage of file uploads.  An
+Application Load Balancer instance distributes incoming traffic among
+the EC2 instances and handles SSL off-loading.  Application specific
+system configuration (including external passwords) is managed via
+Puppet.
+
+<link to detailed specification>
+
+
+- central ops team builds and manages all aspects of AWS infrastructure
+- infrastructure is probably not codebased
+- EC2 instances require ongoing system administration: patching, user
+  access, etc. (non-immutability)
+- app team requires direct shell access to EC2 instances to perform
+  application support tasks
+- app team does not require access to AWS APIs
+
+
+2. Immutable EC2 with autoscaling
+---------------------------------
+
+This scenario is mostly similar to the above with two primary
+differences: EC2 instances are now part of an Autoscaling Group, and
+both application and system logs are exported to an S3 bucket via
+CloudWatch.  Puppet is no longer used, as application and system
+configuration are applied via userdata scriptes at EC2 launch time.
+External passwords are retrieved from either SSM Parameter Store or
+SecretsManager at launch time.  EC2 instances are ephemeral.  Any
+changes to EC2 state, whether for system configuration, patching, or
+application code updates, are executed by trigging the Autoscaling
+service to perform a controlled re-launch of the EC2 instances.
+
+
+<link to detailed specification>
+
+- infrastructure is completely codebased 
+- deployment of infrastructure can be done by either central ops or the
+  application team.
+
+
+
+
+
+4. Docker in Fargate with S3
+----------------------------
 
 I propose to build out this application infrastructure using Docker 
 containers hosted in AWS Fargate Elastic Container Service.  Fargate ECS
@@ -66,4 +138,4 @@ Features
 - Application logging via CloudWatch with logs residing on S3.
 
 
-
+.
