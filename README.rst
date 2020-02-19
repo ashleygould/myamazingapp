@@ -47,21 +47,26 @@ Excercise description
 Some Additional Considerations
 ------------------------------
 
-- SSL
-- Codebased Infrastructure
+- Infrastructure as code
 - Immutable Infrastructure
 - CI/CD
-- Integaration of Application Code with Infrastructure APIs
+- SSL/TLS encryption
+- Expertese and comfort level of developers
+- Integaration of AWS API calls within application code 
+- Resource Tagging
+- Orchestration
 
 
 
 
-I came up with 5 alternative solutions. All solutions assume AWS as cloud provider:
+I came up with five solutions. All solutions assume AWS as cloud
+provider.  Taken in sequence, this set of solutions describes a possible
+evolution path for application hosting in AWS:
 
 1. Managed EC2 with Puppet
 2. Immutable EC2 with autoscaling
-3. Docker in ECS with EFS
-4. Docker in Fargate with S3
+3. Docker in standard ECS
+4. Docker in Fargate ECS with S3
 5. Lambda with S3, ApiGateway, and CloudFront
 
 
@@ -93,24 +98,69 @@ Puppet.
 2. Immutable EC2 with autoscaling
 ---------------------------------
 
-This scenario is mostly similar to the above with two primary
-differences: EC2 instances are now part of an Autoscaling Group, and
-both application and system logs are exported to an S3 bucket via
-CloudWatch.  Puppet is no longer used, as application and system
-configuration are applied via userdata scriptes at EC2 launch time.
-External passwords are retrieved from either SSM Parameter Store or
-SecretsManager at launch time.  EC2 instances are ephemeral.  Any
-changes to EC2 state, whether for system configuration, patching, or
-application code updates, are executed by trigging the Autoscaling
-service to perform a controlled re-launch of the EC2 instances.
+This scenario is mostly similar to the above with a few notable
+differences.  EC2 instances are now part of an Autoscaling Group. 
+Both application and system logs are exported to an S3 bucket via
+CloudWatch.
 
+EC2 instances are ephemeral.  Any changes to EC2 state, whether for
+system configuration, patching, or application code updates, are
+executed by the Autoscaling service which performs a sequential
+re-build/re-launch of the EC2 instances.  Such events are controlled by
+a CodePileline instance and are triggered whenever a commit is pushed to
+the appropriate branch of the application's git repository.
+
+Puppet is no longer used.  Application and system configuration are
+applied via userdata scripts at EC2 launch time.  External passwords are
+retrieved from either SSM Parameter Store or SecretsManager at launch
+time.
 
 <link to detailed specification>
 
-- infrastructure is completely codebased 
-- deployment of infrastructure can be done by either central ops or the
-  application team.
+.. https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ruby-rails-tutorial.html
 
+- all AWS resources defined and deployed from code (CloudFormation).
+- deployment of infrastructure can be done by either central ops or the
+  application team, depending on our support model.
+- no direct shell access to EC2 instances.
+- app team requires read/write access to an AWS sandbox account to
+  develop and test infrastructure code.
+- app team requires read access to CloudWatch logs.
+
+
+
+3. Docker in ECS - EC2 Launch Type
+----------------------------------
+
+This scenario exchanges the EC2 instances in the AutoScaling Group with
+ECS optimized EC2 instances to form an ECS Cluster.  Since the ECS
+Cluster is built using the EC2 Launch Type, the application can still
+make use of the EFS volume for file uploads.   
+
+ECS Task and Service resources are defined to run the app as a Docker
+instance on the ECS Cluster.  Docker images built from application code
+are posted to an ECR repository instance.  The ECS Service sources this
+repository to re-deploy updated images to the ECS Cluster.
+
+Upon pushing a new commit into the appropriate branch of the
+application's git repository, the CodePipeline instance now runs a build
+stage which builds a new Docker image and pushes it to the ECR
+repository.  It then notifies the ECS Service to re-start the running
+Docker instance using the updated image.
+
+<link to detailed specification>
+
+- docker provides a very convenient develpment workflow
+- app team members must become profficient with Docker
+
+
+.. https://aws.amazon.com/blogs/compute/using-amazon-efs-to-persist-data-from-amazon-ecs-containers/
+
+.. https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started-ecs-ec2.html
+
+.. https://aws.amazon.com/premiumsupport/knowledge-center/ecs-create-docker-volume-efs/
+
+.. https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_efs.html
 
 
 
@@ -118,24 +168,12 @@ service to perform a controlled re-launch of the EC2 instances.
 4. Docker in Fargate with S3
 ----------------------------
 
-I propose to build out this application infrastructure using Docker 
-containers hosted in AWS Fargate Elastic Container Service.  Fargate ECS
-provides HA and horizontal scaling of docker containers.  The solution
-is entirely codebased, and all infrastructure is immutable - no servers to
-maintain.
+In this scenario the ECS Cluster is defined using the Fargate Launch
+Type.  This greatly simplifies AWS Resource coding and cluster
+maintenance.  However, it precludes the use of EFS.  Instead, the
+application now uses AWS API calls (AWS SDK for Ruby) to post uploaded
+files to an S3 bucket.
 
-Features
---------
+<link to detailed specification>
 
-- Application and infrastructure code hosted on Github.
-- Infratructure provissioned using Cloudformation.
-- Automated application deployments via AWS CodePileline, deployments
-  triggered by git commit.
-- Docker images hosted on AWS ERS.
-- Docker instances run in an ECS cluster spanning two AvailabilityZones.
-- DB backend hosted on AWS RDS.
-- File uploadeds hosted by AWS S3.
-- Application logging via CloudWatch with logs residing on S3.
-
-
-.
+.. https://aws.amazon.com/sdk-for-ruby/
