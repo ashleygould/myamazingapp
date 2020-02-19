@@ -1,9 +1,9 @@
 MyAmazingApp
 ============
 
-This is my response to job interview exercise
+This is my reponse to job interview excercise
 
-Exercises description
+Excercise description
 ---------------------
 
 ::
@@ -52,8 +52,8 @@ Some Additional Considerations
 - CI/CD
 - SSL/TLS encryption
 - User Authentication
-- Expertise and comfort level of developers
-- Integration of AWS API calls within application code 
+- Expertese and comfort level of developers
+- Integaration of AWS API calls within application code 
 - Resource Tagging
 - Orchestration
 
@@ -75,20 +75,20 @@ evolution path for application hosting in AWS:
 --------------------------
 
 In this scenario, the application is hosted on two EC2 instances each
-deployed into a separate Availability Zone for high availability.  DB
-back-end is hosted on two RDS instances (again, in separate AZs) one of
-which is a read-only replica.  A single EFS instance is mounted by both
-EC2 instances to provide shared storage of file uploads, user stats data
-and weekly reports.  An Application Load Balancer instance distributes
-incoming traffic among the EC2 instances and handles SSL off-loading.
-Application specific system configuration (including external passwords)
-is managed via Puppet.
+deployed into a separate Availabitly Zone for high availability.  DB
+backend is hosted on two RDS instances (again, in separate AZs) one of
+which is a read-only replica.  A single EFS instance is mounted by
+both EC2 instances to provide shared storage of file uploads.  An
+Application Load Balancer instance distributes incoming traffic among
+the EC2 instances and handles SSL off-loading.  Application specific
+system configuration (including external passwords) is managed via
+Puppet.
 
 <link to detailed specification>
 
 
 - central ops team builds and manages all aspects of AWS infrastructure
-- infrastructure is probably not code-based
+- infrastructure is probably not codebased
 - EC2 instances require ongoing system administration: patching, user
   access, etc. (non-immutability)
 - app team requires direct shell access to EC2 instances to perform
@@ -121,14 +121,13 @@ time.
 .. https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ruby-rails-tutorial.html
 
 - all AWS resources defined and deployed from code (CloudFormation).
-- no direct shell access to EC2 instances.
 - deployment of infrastructure can be done by either central ops or the
   application team, depending on our support model.
+- no direct shell access to EC2 instances.
 - app team requires read/write access to an AWS sandbox account to
   develop and test infrastructure code.
 - app team requires read access to CloudWatch logs.
-- app team must become proficient with CloudFormation and some AWS
-  services - EC2, AutoScaling, ALB, IAM, SSM, CodePipeline.
+
 
 
 3. Docker in ECS - EC2 Launch Type
@@ -152,13 +151,8 @@ Docker instance using the updated image.
 
 <link to detailed specification>
 
-- docker provides a very convenient development workflow
-- fully code-based/immutable infrastructure
-- app team members must become proficient with Docker
-- app team members must become proficient with additional AWS
-  Services - ECS, ECR, RDS, EFS
-- deployment and support of infrastructure now falls to application team
-- app team requires read/write access to an all AWS environments
+- docker provides a very convenient develpment workflow
+- app team members must become profficient with Docker
 
 
 .. https://aws.amazon.com/blogs/compute/using-amazon-efs-to-persist-data-from-amazon-ecs-containers/
@@ -181,35 +175,8 @@ maintenance.  However, it precludes the use of EFS.  Instead, the
 application now uses AWS API calls (AWS SDK for Ruby) to post uploaded
 files to an S3 bucket.
 
-User stats data and weekly reports are now also posted to an S3 bucket.
-A CloudFront distribution is created to serve these reports.
+
 
 <link to detailed specification>
 
 .. https://aws.amazon.com/sdk-for-ruby/
-
-- fully code-based/immutable infrastructure
-- app team fully supports application and infrastructure
-- app team members must become proficient with AWS SDK for Ruby
-- app team members must become proficient with additional AWS
-  Services - S3, CloudFront
-
-
-
-5. Lambda with S3, ApiGateway, and CloudFront
----------------------------------------------
-
-This scenario the Rails application runs as a set of Lambda functions
-fronted by an ApiGateway instance.  Access logs, uploaded files, user
-stats data and weekly reports all reside in S3.  As above, weekly 
-user stats reports are served via CloudFront.
-
-<link to detailed specification>
-
-- serverless architecture
-- fully code-based/immutable infrastructure
-- app team fully supports application and infrastructure
-- app team members must become proficient with additional AWS
-  Services - Lambda, ApiGateway
-
-.. https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html
