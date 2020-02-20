@@ -1,4 +1,4 @@
-.. _docker_in_fargate:
+.. _solution_4_details:
 
 Technical Details - Solution 4
 ==============================

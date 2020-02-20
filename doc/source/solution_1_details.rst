@@ -1,4 +1,4 @@
-.. _ec2_with_puppet:
+.. _solution_1_details:
 
 Technical Details - Solution 1
 ==============================
