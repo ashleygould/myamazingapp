@@ -21,9 +21,9 @@ Layout of primary AWS resources within the VPC.
 
   VPC1:
     EFS_filesystem1
-    ALB1
     az1:
       public_subnet1:
+        ALB1
         EC2_bastion_host
       private_subnet1:
         EC2_instance1
