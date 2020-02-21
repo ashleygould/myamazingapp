@@ -169,8 +169,6 @@ ________________________________________________________________________________
    24  sudo cp Gemfile Gemfile.orig
    25  sudo vi Gemfile
    29  diff Gemfile Gemfile.orig
-
-[ec2-user@ip-129-155-160-232 myamazingapp]$ diff Gemfile Gemfile.orig
 55,57d54
 < 
 < # ashly's hack 

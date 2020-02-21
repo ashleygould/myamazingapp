@@ -1,0 +1,26 @@
+# helpful links
+# https://guides.rubyonrails.org/command_line.html
+# http://blog.serverworks.co.jp/tech/2020/01/19/rails6/
+f
+sudo yum -y update
+
+sudo amazon-linux-extras install -y ruby2.6
+sudo yum install -y gcc gcc-c++ make zlib-devel git 
+sudo yum install -y ruby-devel sqlite-devel
+
+curl -sL https://rpm.nodesource.com/setup_12.x | sudo bash -
+curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+sudo yum install -y nodejs yarn
+
+gem install sqlite3
+gem install rails
+
+rails new ~/myamazingapp
+cd ~/myamazingapp/
+echo "gem 'io-console', '>= 0.5.6'" >> Gemfile
+sudo gem pristine --all
+bundle install
+rails webpacker:install
+rails server
+
+
