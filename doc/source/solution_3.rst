@@ -25,7 +25,10 @@ stage which builds a new Docker image and pushes it to the ECR
 repository.  It then notifies the ECS Service to re-start the running
 Docker instance using the updated image.
 
-:ref:`solution_3_details`
+.. :ref:`solution_3_details`
+
+Operational Considerations
+**************************
 
 - docker provides a very convenient development workflow
 - fully code-based/immutable infrastructure

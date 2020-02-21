@@ -67,10 +67,15 @@ Some Additional Considerations
 
 
 
+My Solutions
+------------
 
 I came up with five solutions. All solutions assume AWS as cloud
 provider.  Taken in sequence, this set of solutions describes a possible
-evolution path for application hosting in AWS:
+evolution path for application hosting in AWS.
+
+I have included detailed technical specs for solutions 1 and 4 only.
+
 
 .. toctree::
    :titlesonly:

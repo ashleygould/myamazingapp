@@ -15,7 +15,9 @@ provisioning resources with CloudFormation.
 AWS Resources
 -------------
 
-Layout of primary AWS resources within the VPC::
+Layout of primary AWS resources within the VPC.
+
+::
 
   VPC1:
     EFS_filesystem1
@@ -38,11 +40,26 @@ Layout of primary AWS resources within the VPC::
     bucket_policy
 
 
-VPC Details::
+VPC Details
+***********
+
+::
 
   VPC1:
     internet gateway
     route table
+    az1:
+      public_subnet1
+        route table
+        nat gateway
+      private_subnet1
+        route table
+    az2:
+      public_subnet2:
+        route table
+        nat gateway
+      private_subnet2:
+        route table
     security groups:
     - public_web_access
       - source: world
@@ -57,25 +74,14 @@ VPC Details::
       - source: public_ssh_access
         ports: all
     - private_subnets_access
-      - source: private_subnet1
+      - source: private_subnets_access
         ports: all
-      - source: private_subnet2
-        ports: all
-    az1:
-      public_subnet1
-        route table
-        nat gateway
-      private_subnet1
-        route table
-    az2:
-      public_subnet2:
-        route table
-        nat gateway
-      private_subnet2:
-        route table
 
 
-ApplicationLoadBalancer Details (ALB)::
+Appliction Load Balancer Details
+********************************
+
+::
 
   ALB1:
     subnet: public_subnet1
@@ -103,7 +109,12 @@ ApplicationLoadBalancer Details (ALB)::
             proto: https
             port: 443
 
-RDS database Details::
+
+
+RDS DB Instance Details
+***********************
+
+::
 
   RDS_DB_instance1:
     VPC: VPC1
@@ -118,7 +129,10 @@ RDS database Details::
       - private_subnet2
 
 
-EFS Share Details::
+EFS FileSystem Details
+**********************
+
+::
 
   EFS_filesystem1:
     VPC: VPC1
@@ -134,29 +148,10 @@ EFS Share Details::
         subnet: private_subnet2
 
 
-EC2 Instance Details::
+EC2 Bastion Host Details
+************************
 
-  EC2_instance1:
-    KeyPair: ec2_admin
-    SubnetId: private_subnet1
-    SecurityGroups:
-    - bastion_host_access
-      alb_target_group_access
-      private_subnets_access
-    ImageId: AmazonLinux2 AMI
-    InstanceType: t3.medium
-    UserData: bootscript.sh
-
-  EC2_instance2:
-    KeyPair: ec2_admin
-    SubnetId: private_subnet2
-    SecurityGroups:
-    - bastion_host_access
-      alb_target_group_access
-      private_subnets_access
-    ImageId: AmazonLinux2 AMI
-    InstanceType: t3.medium
-    UserData: bootscript.sh
+::
 
   EC2_bastion_host:
     KeyPair: ec2_admin
@@ -168,6 +163,26 @@ EC2 Instance Details::
     UserData:
       #!/usr/bin/bash
       yum update -y
+
+
+EC2 Instance Details
+********************
+
+AWS specs for two EC2 instances are identical with the exception of the
+``SubnetId``.
+
+::
+
+  EC2_instance1:
+    KeyPair: ec2_admin
+    SubnetId: private_subnet1
+    SecurityGroups:
+    - bastion_host_access
+      alb_target_group_access
+      private_subnets_access
+    ImageId: AmazonLinux2 AMI
+    InstanceType: t3.medium
+    UserData: bootscript.sh
 
 EC2 Userdata Script::
 

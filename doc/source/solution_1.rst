@@ -19,15 +19,15 @@ provide shared storage of file uploads, user stats data and weekly reports.  An
 Application Load Balancer instance distributes incoming traffic among the EC2
 instances and handles SSL off-loading.
 
-Application specific system configuration are managed via Puppet.  Passwords
+Application specific system configurations are managed via Puppet.  Passwords
 for external services are supplied to puppet manifests via GPG encrypted hiera
 data (hiera-eyaml-gpg).
 
 This full stack should be replicated to create a QA or staging environment for
 validating application code and for testing AWS infrastructure modifications.
 A non-redundant version of this stack with a single EC2 instance should be
-used for application puppet manifest development.  All three stacks can
-share the same VPC, but a separate set of security groups is used for
+used for application and puppet manifest development.  All three stacks can
+share the same VPC, but a separate set of security groups should be used for
 each environment.
 
 :ref:`solution_1_details`
@@ -41,10 +41,11 @@ Operational Considerations
 - infrastructure is probably not code-based.
 - EC2 instances require ongoing system administration: patching, user
   access, etc. (non-immutability).
-- depending on thoroughness and detail of puppet manifests, it may somewhat
-  difficult to migrate to another environment.  Difficulty is greatly reduced
-  if AWS infrastructure is defined in CloudFormation templates.
-- app team requires direct shell access to EC2 instances to perform.
+- depending on thoroughness and detail of puppet manifests, migrating the
+  hosted application to another environment could be somewhat difficult or
+  fairly easy.  Difficulty is greatly reduced if AWS infrastructure is defined
+  in CloudFormation templates.
+- app team requires direct shell access to EC2 instances to perform
   application provisioning and support tasks.
 - app team does not require access to AWS APIs.
 

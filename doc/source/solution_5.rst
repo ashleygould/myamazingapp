@@ -14,7 +14,10 @@ fronted by an ApiGateway instance.  Access logs, uploaded files, user
 stats data and weekly reports all reside in S3.  As above, weekly 
 user stats reports are served via CloudFront.
 
-:ref:`solution_5_details`
+.. :ref:`solution_5_details`
+
+Operational Considerations
+**************************
 
 - serverless architecture
 - fully code-based/immutable infrastructure

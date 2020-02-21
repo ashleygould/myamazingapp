@@ -27,9 +27,12 @@ applied via userdata scripts at EC2 launch time.  External passwords are
 retrieved from either SSM Parameter Store or SecretsManager at launch
 time.
 
-:ref:`solution_2_details`
+.. :ref:`solution_2_details`
 
 .. https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ruby-rails-tutorial.html
+
+Operational Considerations
+**************************
 
 - all AWS resources defined and deployed from code (CloudFormation).
 - no direct shell access to EC2 instances.

@@ -22,7 +22,8 @@ A CloudFront distribution is created to serve these reports.
 :ref:`solution_4_details`
 
 
-.. https://aws.amazon.com/sdk-for-ruby/
+Operational Considerations
+**************************
 
 - fully code-based/immutable infrastructure
 - app team fully supports application and infrastructure
@@ -30,5 +31,6 @@ A CloudFront distribution is created to serve these reports.
 - app team members must become proficient with additional AWS
   Services - S3, CloudFront
 
+.. https://aws.amazon.com/sdk-for-ruby/
 
 
