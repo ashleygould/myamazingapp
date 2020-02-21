@@ -15,21 +15,22 @@ provisioning resources with CloudFormation.
 AWS Resources
 -------------
 
-Layout of primary AWS resources in the VPC::
+Layout of primary AWS resources within the VPC::
 
   VPC1:
     EFS_filesystem1
     ALB1
     az1:
       public_subnet1:
-        EC2_instance1
+        EC2_bastion_host
       private_subnet1:
+        EC2_instance1
         EFS_mountpoint1
         RDS_DB_instance1
     az2:
       public_subnet2:
-        EC2_instance2
       private_subnet2:
+        EC2_instance2
         EFS_mountpoint2
         RDS_DB_standby_replica
 
@@ -43,14 +44,23 @@ VPC Details::
     internet gateway
     route table
     security groups:
-      - public web access
-        - world 
-      - ec2 instance access:
-        - ssh
-      - efs mount target access
-        - ec2 nfs client
-      - rds db access
-        - ec2 db client
+    - public_web_access
+      - source: world
+        ports: 80, 443
+    - public_ssh_access:
+      - source: on-prem developer hosts
+        ports: 22
+    - alb_target_group_access
+      - source: public_web_access
+        ports: 3000
+    - bastion_host_access
+      - source: public_ssh_access
+        ports: all
+    - private_subnets_access
+      - source: private_subnet1
+        ports: all
+      - source: private_subnet2
+        ports: all
     az1:
       public_subnet1
         route table
@@ -69,24 +79,29 @@ ApplicationLoadBalancer Details (ALB)::
 
   ALB1:
     subnet: public_subnet1
+    securitygroups: public_web_access
+    target_groups:
     - target_group1:
-        - EC2_instance1
-        - EC2_instance2
+      - EC2_instance1
+      - EC2_instance2
+    listeners:
     - listener1:
         protocol: https
-        protocol: 443
+        ports: 443
+        certificates: 
+        - myamazingapp.example.com
         rules:
-          - type: forward
-            forwardconfig:
-              targetgroup: target_group1
+        - type: forward
+          forwardconfig:
+            targetgroup: target_group1
     - listener2:
         protocol: http
-        protocol: 80
+        ports: 80
         rules:
-          - type: redirect
-            redirectconfig:
-              proto: https
-              port: 443
+        - type: redirect
+          redirectconfig:
+            proto: https
+            port: 443
 
 RDS database Details::
 
@@ -94,6 +109,9 @@ RDS database Details::
     VPC: VPC1
     MultiAZ: true
     StorageEncrypted: true
+    securitygroups:
+    - bastion_host_access
+      private_subnets_access
     DBsubnet groups:
     - db_subnetgroup1:
       - private_subnet1
@@ -104,9 +122,11 @@ EFS Share Details::
 
   EFS_filesystem1:
     VPC: VPC1
+    securitygroups:
+      private_subnets_access
     access points:
-    - /root/uploads
-    - /root/user_stats
+    - EFS_accesspoint1: /root/uploads
+    - EFS_accesspoint2: /root/user_stats
     mount points:
     - EFS_mountpount1:
         subnet: private_subnet1
@@ -118,27 +138,52 @@ EC2 Instance Details::
 
   EC2_instance1:
     KeyPair: ec2_admin
-    SubnetId: public_subnet1
-    SecurityGroups: ec2_instance_access
-    ImageId: AmazonLinux2
+    SubnetId: private_subnet1
+    SecurityGroups:
+    - bastion_host_access
+      alb_target_group_access
+      private_subnets_access
+    ImageId: AmazonLinux2 AMI
     InstanceType: t3.medium
     UserData: bootscript.sh
 
+  EC2_instance2:
+    KeyPair: ec2_admin
+    SubnetId: private_subnet2
+    SecurityGroups:
+    - bastion_host_access
+      alb_target_group_access
+      private_subnets_access
+    ImageId: AmazonLinux2 AMI
+    InstanceType: t3.medium
+    UserData: bootscript.sh
+
+  EC2_bastion_host:
+    KeyPair: ec2_admin
+    SubnetId: public_subnet1
+    SecurityGroups:
+    - public_ssh_access:
+    ImageId: AmazonLinux2 AMI
+    InstanceType: t3.nano
+    UserData:
+      #!/usr/bin/bash
+      yum update -y
 
 EC2 Userdata Script::
 
   #!/usr/bin/bash
+  # bootscript.sh
 
   yum update -y
 
 
   # NFS Mounts
   EFS_FS_ID="fs-12345678"
-  EFS_mountpount1="fsap-092e9f80b3fb5e6f3"
-  EFS_mountpount2="fsap-1234qwe3456734565"
+  EFS_accesspoint1="fsap-XXXXXXXXXXXXXXXXX"
+  EFS_accesspoint2="fsap-YYYYYYYYYYYYYYYYY"
   cat << EOF >> /etc/fstab
-  file-system-id $EFS_FS_ID efs _netdev,tls,accesspoint=${EFS_mountpount1} 0 0
-  file-system-id $EFS_FS_ID efs _netdev,tls,accesspoint=${EFS_mountpount2} 0 0
+  file-system-id $EFS_FS_ID efs _netdev,tls,accesspoint=${EFS_accesspoint1} 0 0
+  file-system-id $EFS_FS_ID efs _netdev,tls,accesspoint=${EFS_accesspoint2} 0 0
   EOF
   mount -a
 
@@ -161,8 +206,8 @@ EC2 Userdata Script::
   gem install rails
 
 
-  # Install Puppet Agent
-  gems install puppet
+  # Install Puppet Agent and generate client SSL certificate
+  gems install puppet gpgme
   cat << EOF >> /etc/puppet/puppet.conf
   server = puppet.example.com
   EOF
