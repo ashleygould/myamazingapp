@@ -62,19 +62,24 @@ VPC Details
         route table
     security groups:
     - public_web_access
-      - source: world
+      - notes: allow web access to the ALB
+        source: world
         ports: 80, 443
     - public_ssh_access:
-      - source: on-prem developer hosts
+      - notes: allow developers ssh access to the bastion host
+        source: on-prem datacenter
         ports: 22
     - alb_target_group_access
-      - source: public_web_access
+      - notes: allow ALB access to Rails application port on EC2 Instances
+        source: public_web_access
         ports: 3000
     - bastion_host_access
-      - source: public_ssh_access
+      - notes: allow bastion host to access EC2 Instances and RDS DB
+        source: public_ssh_access
         ports: all
     - private_subnets_access
-      - source: private_subnets_access
+      - notes: allow all resources in private subnets to access one another
+        source: private_subnets_access
         ports: all
 
 

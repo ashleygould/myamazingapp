@@ -32,11 +32,13 @@ Operational Considerations
 
 - docker provides a very convenient development workflow
 - fully code-based/immutable infrastructure
+- the dockerized application is now very portable
 - app team members must become proficient with Docker
 - app team members must become proficient with additional AWS
   Services - ECS, ECR, RDS, EFS
+- the EC2 instance nodes in the ECS cluster require some ongoing maintenance
 - deployment and support of infrastructure now falls to application team
-- app team requires read/write access to an all AWS environments
+- app team requires read/write access to the AWS environment
 
 
 .. https://aws.amazon.com/blogs/compute/using-amazon-efs-to-persist-data-from-amazon-ecs-containers/

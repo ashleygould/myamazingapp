@@ -19,16 +19,21 @@ provide shared storage of file uploads, user stats data and weekly reports.  An
 Application Load Balancer instance distributes incoming traffic among the EC2
 instances and handles SSL off-loading.
 
+EC2 instances, RDS instances, and EFS access points all reside in private
+subnets within the VPC.  An EC2 bastion host instance resides in a public
+subnet to provide developers and system admins jump box access to instances
+in the private subnets.
+
 Application specific system configurations are managed via Puppet.  Passwords
 for external services are supplied to puppet manifests via GPG encrypted hiera
 data (hiera-eyaml-gpg).
 
-This full stack should be replicated to create a QA or staging environment for
-validating application code and for testing AWS infrastructure modifications.
-A non-redundant version of this stack with a single EC2 instance should be
-used for application and puppet manifest development.  All three stacks can
-share the same VPC, but a separate set of security groups should be used for
-each environment.
+The entire stack should be replicated to create a QA or staging environment
+for validating application code and for testing AWS infrastructure
+modifications.  A non-redundant version of this stack with a single EC2
+instance should be used for application and puppet manifest development.  All
+three stacks can share the same VPC, but a separate set of security groups
+should be used for each environment.
 
 :ref:`solution_1_details`
 
