@@ -1,0 +1,188 @@
+________________________________________________________________________________
+2/20/2020
+
+ssh -i .ssh/ait_id_rsa ec2-user@35.163.220.90
+
+sudo yum  -y update
+sudo reboot
+
+ssh -i .ssh/ait_id_rsa ec2-user@35.163.220.90
+
+sudo amazon-linux-extras install -y ruby2.6
+sudo yum install -y ruby-devel
+ 
+sudo yum install -y gcc gcc-c++ make zlib-devel git
+
+sudo gem install rails
+
+Successfully installed rails-6.0.2.1
+33 gems installed
+
+
+
+
+
+just guessing now:
+------------------
+
+sudo gem install passenger
+
+rails new ~/app
+
+sudo yum install sqlite-devel
+sudo gem install sqlite3
+
+bundle install
+
+________________________________________________________________________________
+
+IP=34.219.250.180
+
+ssh -i .ssh/ait_id_rsa ec2-user@${IP}
+
+sudo yum  -y update && sudo reboot
+
+
+sudo yum install -y gcc gcc-c++ make zlib-devel git
+sudo amazon-linux-extras install -y ruby2.6
+sudo yum install -y ruby-devel sqlite-devel
+sudo gem install sqlite3
+sudo gem install rails
+
+rails new ~/app
+
+Fail!
+
+-----
+
+sudo /usr/local/bin/rails new /srv/ruby/myamazingapp
+[cut]
+Bundle complete! 17 Gemfile dependencies, 75 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
+         run  bundle binstubs bundler
+The dependency tzinfo-data (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
+         run  bundle exec spring binstub --all
+* bin/rake: Spring inserted
+* bin/rails: Spring inserted
+       rails  webpacker:install
+
+cd /srv/ruby/myamazingapp/
+
+
+sudo /usr/local/bin/rails server
+[cut]
+         1: from /usr/share/gems/gems/bootsnap-1.4.5/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:22:in `block in require_with_bootsnap_lfi'
+/usr/share/gems/gems/bootsnap-1.4.5/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:22:in `require': cannot load such file -- io/console/size (LoadError)
+
+sudo gem install io-console
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ diff Gemfile Gemfile.orig
+55,57d54
+< 
+< # ashly's hack 
+< gem 'io-console', '>= 0.5.6'
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ sudo /usr/local/bin/bundle install
+[cut]
+Bundle complete! 18 Gemfile dependencies, 76 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
+
+/usr/share/gems/gems/webpacker-4.2.2/lib/webpacker/configuration.rb:95:in `rescue in load': Webpacker configuration file not found /srv/ruby/myamazingapp/config/webpacker.yml. Please run rails webpacker:install Error: No such file or directory @ rb_sysopen - /srv/ruby/myamazingapp/config/webpacker.yml (RuntimeError)
+[ec2-user@ip-129-155-160-232 myamazingapp]$ sudo /usr/local/bin/rails webpacker:install
+sh: node: command not found
+sh: nodejs: command not found
+Node.js not installed. Please download and install Node.js https://nodejs.org/en/download/
+
+[ec2-user@ip-129-155-160-232 ~]$ curl -sL https://rpm.nodesource.com/setup_12.x > node_setup.sh
+[ec2-user@ip-129-155-160-232 ~]$ sudo bash node_setup.sh 
+[ec2-user@ip-129-155-160-232 ~]$ sudo yum install -y nodejs
+[cut]
+Installed:
+  nodejs.x86_64 2:12.16.1-1nodesource                                           
+
+
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ sudo /usr/local/bin/rails webpacker:install
+Yarn not installed. Please download and install Yarn from https://yarnpkg.com/lang/en/docs/install/
+
+## To install the Yarn package manager, run:
+     curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+     sudo yum install yarn
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+[yarn]
+name=Yarn Repository
+baseurl=https://dl.yarnpkg.com/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://dl.yarnpkg.com/rpm/pubkey.gpg
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ sudo yum install yarn
+[cut]
+Installed:
+  yarn.noarch 0:1.21.1-1                                                        
+
+Complete!
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ sudo /usr/local/bin/rails webpacker:install
+[cut]
+├─ webpack-dev-middleware@3.7.2
+├─ webpack-dev-server@3.10.3
+├─ websocket-extensions@0.1.3
+├─ ws@6.2.1
+├─ yargs-parser@11.1.1
+└─ yargs@12.0.5
+Done in 7.81s.
+Webpacker successfully installed 🎉 🍰
+
+
+
+Webpacker successfully installed 🎉 🍰
+[ec2-user@ip-129-155-160-232 myamazingapp]$ sudo /usr/local/bin/rails server
+=> Booting Puma
+=> Rails 6.0.2.1 application starting in development 
+=> Run `rails server --help` for more startup options
+Puma starting in single mode...
+* Version 4.3.1 (ruby 2.6.3-p62), codename: Mysterious Traveller
+* Min threads: 5, max threads: 5
+* Environment: development
+* Listening on tcp://127.0.0.1:3000
+* Listening on tcp://[::1]:3000
+Use Ctrl-C to stop
+
+________________________________________________________________________________
+
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ history
+    1  sudo yum  -y update && sudo reboot
+    2  sudo yum install -y gcc gcc-c++ make zlib-devel git
+    3  sudo amazon-linux-extras install -y ruby2.6
+    4  sudo yum install -y ruby-devel sqlite-devel
+    5  sudo gem install sqlite3
+    6  sudo gem install rails
+   11  sudo /usr/local/bin/rails new /srv/ruby/myamazingapp
+   14  cd /srv/ruby/myamazingapp/
+   
+   18  sudo gem install io-console 	# maybe didn't need this 
+
+   23  cp Gemfile Gemfile.orig
+   24  sudo cp Gemfile Gemfile.orig
+   25  sudo vi Gemfile
+   29  diff Gemfile Gemfile.orig
+
+[ec2-user@ip-129-155-160-232 myamazingapp]$ diff Gemfile Gemfile.orig
+55,57d54
+< 
+< # ashly's hack 
+< gem 'io-console', '>= 0.5.6'
+
+   35  curl -sL https://rpm.nodesource.com/setup_12.x > node_setup.sh
+   36  sudo bash node_setup.sh 
+   37  sudo yum install -y nodejs
+
+   43  curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+   44  sudo yum install yarn
+   45  sudo /usr/local/bin/rails webpacker:install
+   46  sudo /usr/local/bin/rails server
+   47  history
+

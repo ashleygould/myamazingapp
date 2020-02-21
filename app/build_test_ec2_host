@@ -1,0 +1,10 @@
+ 1040  ./ec2_test_env.py -r awsauth/OrgAdmin -f ash_test.yaml -k .ssh/ait_id_rsa.pub create
+ 1041  ./ec2_test_env.py -r awsauth/OrgAdmin -f ash_test.yaml -k .ssh/ait_id_rsa.pub report
+ 1042  ssh -i .ssh/ait_id_rsa ec2-user@54.202.132.202
+ 1043  ll .ssh/
+ 1044  chmod 600 .ssh/ait_id_rsa
+ 1045  ssh -i .ssh/ait_id_rsa ec2-user@54.202.132.202
+ 1046  ll
+ 1047  history
+(python3.7) agould@horus:~/git-repos/github/ucopacme/ec2_test_env> ./ec2_test_env.py -r awsauth/OrgAdmin -f ash_test.yaml -k .ssh/ait_id_rsa.pub destroy
+
