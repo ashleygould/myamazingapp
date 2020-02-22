@@ -4,8 +4,6 @@ Technical Details - Solution 4
 ==============================
 
 
-
-
 AWS Resources
 -------------
 
@@ -144,9 +142,73 @@ Only change here is we drop the bastion host security group
 ECR Repository Details
 **********************
 
+::
+
+  Resources:
+    EcrRepository:
+      Type: "AWS::ECR::Repository"
+      Properties:
+        RepositoryName: MyAmazingImageRepo
+
 
 ECS Fargate Cluster and Service Details
 ***************************************
+
+This example is shamelessly cut-n-paste from:
+https://github.com/1Strategy/fargate-cloudformation-example
+
+::
+
+  Parameters:
+    ServiceName
+    ContainerPort
+
+  Resources:
+    Cluster:
+      Type: AWS::ECS::Cluster
+
+    ExecutionRole:
+      Type: AWS::IAM::Role
+    TaskRole:
+      Type: AWS::IAM::Role
+
+    TaskDefinition:
+      Type: AWS::ECS::TaskDefinition
+      Properties:
+        NetworkMode: awsvpc
+        RequiresCompatibilities:
+          - FARGATE
+      ExecutionRoleArn: !Ref ExecutionRole
+      TaskRoleArn: !Ref TaskRole
+      ContainerDefinitions:
+        - Name: !Ref ServiceName
+          Image: !Ref Image
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+      Secrets:
+        - Name: DATABASE_PASSWORD
+          ValueFrom: arn:aws:ssm:::parameter/qa_db_passwd
+
+    Service:
+      Type: AWS::ECS::Service
+      Properties:
+        ServiceName: !Ref ServiceName
+        Cluster: !Ref Cluster
+        TaskDefinition: !Ref TaskDefinition
+        DesiredCount: 2
+        LaunchType: FARGATE
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            AssignPublicIp: DISABLED
+            Subnets:
+              - private_subnet1
+              - private_subnet2
+            SecurityGroups:
+              - private_subnets_access
+        LoadBalancers:
+          - ContainerName: !Ref ServiceName
+            ContainerPort: !Ref ContainerPort
+            TargetGroupArn: target_group1.arn
 
 
 
@@ -221,4 +283,9 @@ to the Prod ECR repository, triggering production deployment.
 
 
 
+Docker Details
+--------------
 
+work in progress
+
+.. https://aws.amazon.com/premiumsupport/knowledge-center/ecs-data-security-container-task/
