@@ -286,6 +286,90 @@ to the Prod ECR repository, triggering production deployment.
 Docker Details
 --------------
 
-work in progress
+Project Dir::
+
+  [agould@localhost docker]$ ls -1
+  app
+  bin
+  config
+  config.ru
+  db
+  docker-compose.yml
+  Dockerfile
+  entrypoint.sh
+  Gemfile
+  Gemfile.lock
+  lib
+  log
+  package.json
+  public
+  Rakefile
+  README.md
+  storage
+  test
+  tmp
+  vendor
+
+
+Dockerfile::
+
+  # https://docs.docker.com/compose/rails/
+  #
+  FROM ruby:2.6
+  
+  RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
+  RUN mkdir /myapp
+  WORKDIR /myapp
+  COPY Gemfile /myapp/Gemfile
+  COPY Gemfile.lock /myapp/Gemfile.lock
+  RUN bundle install
+  COPY . /myapp
+  
+  # Add a script to be executed every time the container starts.
+  COPY entrypoint.sh /usr/bin/
+  RUN chmod +x /usr/bin/entrypoint.sh
+  ENTRYPOINT ["entrypoint.sh"]
+  EXPOSE 3000
+  
+  # Start the main process.
+  CMD ["rails", "server", "-b", "0.0.0.0"]
+
+
+docker-compose.yaml::
+
+  # https://docs.docker.com/compose/rails/
+  #
+  version: '3'
+  services:
+    db:
+      image: postgres
+      volumes:
+        - ./tmp/db:/var/lib/postgresql/data
+    web:
+      build: .
+      command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+      volumes:
+        - .:/myapp
+      ports:
+        - "3000:3000"
+      depends_on:
+        - db
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.. links
 
 .. https://aws.amazon.com/premiumsupport/knowledge-center/ecs-data-security-container-task/
